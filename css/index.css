@@ -150,6 +150,9 @@ body {
     cursor: pointer;
 }
 
+
+
+
 form button[type='submit'] {
     border-radius: 2px;
     border: none;
@@ -169,4 +172,9 @@ form button[disabled] {
     border: 1px solid #999999;
     background-color: #cccccc;
     color: #666666;
+}
+
+form input:invalid,
+form textarea:invalid {
+  border: 1px solid red;
 }
