@@ -15,40 +15,62 @@ const passwordMaxLength = 64;
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form-signup');
     const successModal = document.querySelector('#successModal');
-
     const inputPassword = form.querySelector('#password');
     const passwordCriteria = form.querySelector('#passwordCriteria');
+    const submitButton = form.querySelector('button[type="submit"]');
 
-    console.log($('input#password'));
-
-    form.addEventListener('submit', e => {
+    // Form handler
+    form.addEventListener('submit', async e => {
         e.preventDefault();
         clearErrorMessages(form);
-        submitFormSignup(e.target);
+
+        const fields = getFormData(form);
+        try {
+            const registrationData = await validateInputSignup(fields);
+            console.log(registrationData);
+            showModal(successModal, registrationData);
+        } catch (error) {
+            console.log(error);
+            displayError(fields[error.field].error, error.message);
+        }
     });
 
-    createPasswordEvents(inputPassword, passwordCriteria);
+    // Input click focus events
     createInputFocusEvents(form);
+
+    // Password criteria checker
+    createPasswordEvents(inputPassword, passwordCriteria);
+
+    // Submit button handler
+    submitButton.disabled = true;
+    form.addEventListener('input', () => {
+        checkFormValidity(form, submitButton);
+    });
 });
 
 
-
 /**
+ * Validates user input.
  *
- * @param {*} form
+ * @param {Object} user - user object.
+ * @returns {Promise} - A promise that resolves to an object with the validation results.
  */
-const submitFormSignup = async form => {
-    const fields = getFormData(form);
+const validateInputSignup = async user => {
+    await Promise.all([
+        validateName(user.name.value),
+        validateUsername(user.username.value),
+        validateEmail(user.email.value),
+        validatePassword(user.password.value, user.passwordConfirm.value),
+    ]);
 
-    await validateInputSignup(fields)
-        .then(result => {
-            console.log(result);
-        })
-        .catch(error => {
-            console.log(error);
-            return;
-        });
+    return {
+        name: user.name.value,
+        username: user.username.value,
+        email: user.email.value,
+        password: user.password.value,
+    };
 };
+
 
 /**
  *
@@ -87,6 +109,11 @@ const createInputFocusEvents = form => {
     });
 };
 
+/**
+ *
+ * @param {*} form
+ * @returns
+ */
 const getFormData = form => {
     const field = selector => {
         let element = form.querySelector(selector);
@@ -105,36 +132,44 @@ const getFormData = form => {
     };
 };
 
+
+
 /**
- * Validates user input.
  *
- * @param {Object} user - user object.
- * @returns {Promise} - A promise that resolves to an object with the validation results.
+ * @param {*} element
+ * @param {*} message
  */
-const validateInputSignup = async user => {
-    console.log(user);
-
-    let result = await Promise.all([
-        validateName(user.name.value),
-        validateUsername(user.username.value),
-        validateEmail(user.email.value),
-        validatePassword(user.password.value, user.passwordConfirm.value),
-    ]);
-
-    console.log(result);
-
-    return result;
-};
-
 const displayError = (element, message) => {
     element.classList.toggle('.hidden');
     element.innerHTML = message;
 };
 
-const showModel = id => {};
+/**
+ *
+ * @param {Element} modal
+ * @param {Object} data
+ */
+const showModal = (modal, data) => {
+    document.getElementById('modalName').textContent = data.name;
+    document.getElementById('modalUsername').textContent = data.username;
+    document.getElementById('modalEmail').textContent = data.email;
 
+    modal.classList.remove('hidden');
+    modal.querySelector('.close').addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+};
+
+/**
+ *
+ * @param {*} id
+ */
 const closeModal = id => {};
 
+/**
+ *
+ * @param {*} element
+ */
 const clearErrorMessages = element => {
     Array.from(element.querySelectorAll('span.error')).forEach(error => {
         error.classList.add('hidden');
@@ -183,7 +218,8 @@ const validateUsername = username => {
             return;
         }
 
-        if (!username.match(/^[a-zA-Z0-9]$/)) {
+        if (!/^[a-zA-Z0-9]+$/.test(username)) {
+            console.log(username);
             reject('Username must contain only letters and numbers.');
             return;
         }
@@ -205,6 +241,11 @@ const validateEmail = email => {
     });
 };
 
+/**
+ *
+ * @param {*} password
+ * @returns
+ */
 const validatePassword = password => {
     return new Promise((resolve, reject) => {
         const results = checkPasswordCriteria(password);
@@ -217,6 +258,12 @@ const validatePassword = password => {
     });
 };
 
+/**
+ *
+ * @param {*} password
+ * @param {*} passwordConfirm
+ * @returns
+ */
 const validatePasswordConfirm = (password, passwordConfirm) => {
     return new Promise((resolve, reject) => {
         if (password !== passwordConfirm) {
@@ -239,6 +286,26 @@ const checkPasswordCriteria = password => {
         { criteria: 'lowerCaseCriteria', pattern: /[a-z]/ },
         { criteria: 'specialCharCriteria', pattern: /[!@#$%^&*(),.?":{}|<>]/ },
     ].map(({ criteria, pattern }) => ({ criteria, valid: pattern.test(password) }));
+};
+
+/**
+ *
+ * @param {*} form
+ * @param {*} submitButton
+ */
+const checkFormValidity = (form, submitButton) => {
+    const fields = getFormData(form);
+    const allFieldsFilled = !Object.values(fields).some(field => !field);
+    const password = fields.password.value;
+    const passwordConfirm = fields.passwordConfirm.value;
+    const passwordValid = checkPasswordCriteria(password).every(result => result.valid);
+    const passwordsMatch = password === passwordConfirm;
+
+    if (allFieldsFilled && passwordValid && passwordsMatch) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
 };
 
 /***********************************************************************/

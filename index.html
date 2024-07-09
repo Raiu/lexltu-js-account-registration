@@ -10,38 +10,39 @@
     <body>
         <main>
             <form
-                class="form-signup flex flex-col justify-center items-center"
+                class="form-signup flex flex-col justify-center items-center text-center screen-center"
                 id="form-signup"
                 method="post"
                 action="#">
-                <fieldset class="flex flex-col justify-center items-center">
-                    <legend>Register your account</legend>
+                <fieldset class="flex flex-col justify-center items-center p-8 bg-gray-500">
+                    <h2 class="m-4 text-2xl">Register your account</h2>
                     <div class="field">
-                        <label>
+                        <label class="label-above">
                             <span>Name</span>
-                            <input type="text" name="name" id="name" autocomplete="name" autofocus />
-                            <span id="name-error" class="error hidden">test</span>
                         </label>
+                        <input type="text" name="name" id="name" autocomplete="name" autofocus />
+                        <span id="name-error" class="error hidden">test</span>
                     </div>
                     <div class="field">
-                        <label>
+                        <label class="label-above">
                             <span>Username</span>
-                            <input type="text" name="username" id="username" autocomplete="username" />
-                            <span id="username-error" class="error hidden"></span>
                         </label>
-                    </div>
-                    <div class="field">                        <label>
-                            <span>Email</span>
-                            <input type="email" name="email" id="email" autocomplete="email" />
-                            <span id="email-error" class="error hidden"></span>
-                        </label>
+                        <input type="text" name="username" id="username" autocomplete="username" />
+                        <span id="username-error" class="error hidden"></span>
                     </div>
                     <div class="field">
-                        <label>
-                            <span>Password</span>
-                            <input type="password" name="password" id="password" autocomplete="new-password" />
-                            <span id="password-error" class="error hidden"></span>
+                        <label class="label-above">
+                            <span>Email</span>
                         </label>
+                        <input type="email" name="email" id="email" autocomplete="email" />
+                        <span id="email-error" class="error hidden"></span>
+                    </div>
+                    <div class="field">
+                        <label class="label-above">
+                            <span>Password</span>
+                        </label>
+                        <input type="password" name="password" id="password" autocomplete="new-password" />
+                        <span id="password-error" class="error hidden"></span>
                         <ul id="passwordCriteria" class="hidden">
                             <li id="lengthCriteria" class="invalid">8 to 64 characters long</li>
                             <li id="upperCaseCriteria" class="invalid">At least one uppercase letter</li>
@@ -50,14 +51,15 @@
                         </ul>
                     </div>
                     <div class="field">
-                        <label>
+                        <label class="label-above">
                             <span>Confirm Password</span>
-                            <input
-                                type="password"
-                                name="password-confirm"
-                                id="password-confirm"
-                                autocomplete="new-password" />
                         </label>
+                        <input
+                            type="password"
+                            name="password-confirm"
+                            id="password-confirm"
+                            autocomplete="new-password" />
+                            <span id="password-confirm-error" class="error hidden"></span>
                     </div>
                     <button class="btn submit" type="submit">Sign up</button>
                 </fieldset>
@@ -65,10 +67,13 @@
         </main>
 
         <div id="successModal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Success!</h2>
-                <p>Your account has been created.</p>
-                <button class="modal-close">Close</button>
+            <div class="modal-content text-center">
+                <h3>Success!</h3>
+                <p>Your account has been created with the following information:</p>
+                <p>Name: <span id="modalName"></span></p>
+                <p>Username: <span id="modalUsername"></span></p>
+                <p>Email: <span id="modalEmail"></span></p>
+                <button class="close">Close</button>
             </div>
         </div>
         <script src="./js/index.js"></script>
